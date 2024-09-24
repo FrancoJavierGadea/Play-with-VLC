@@ -1,9 +1,10 @@
 
 
-export default async function toggleFullscreen({url, password} = {}) {
-    
+export default async function setVolume({url, password, value} = {}){
+
     const request = url + '?' + new URLSearchParams({
-        'command': 'fullscreen'
+        'command': 'volume',
+        'val': value
     })
     .toString();
 
@@ -18,9 +19,9 @@ export default async function toggleFullscreen({url, password} = {}) {
 
         const statusXML = await response.text();
 
-        const fullscreen = new RegExp(/<fullscreen>(.*?)<\/fullscreen>/g)
+        const volume = new RegExp(/<volume>(.*?)<\/volume>/g)
             .exec(statusXML)?.at(1);
 
-        return {fullscreen};
+        return {volume};
     }
 }

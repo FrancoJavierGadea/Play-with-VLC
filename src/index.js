@@ -12,8 +12,6 @@ VLC.play(video);
 
 
 const KEYS = {
-    I: 'i',
-    P: 'p',
     CTRL_C: '\u0003',
     ARROW_UP: '\u001b[A',
     ARROW_DOWN: '\u001b[B',
@@ -34,20 +32,32 @@ process.stdin.on('data', (key) => {
             VLC.stop();
             process.exit();
           
-        case KEYS.P:
+        case 'p':
+        case 'P':
         case KEYS.SPACE:
             VLC.togglePause();
             break;
 
         case KEYS.ARROW_UP:
-            VLC.volume(20);
+            VLC.setVolume('+20');
             break;
 
         case KEYS.ARROW_DOWN:
-            VLC.volume(-20);
+            VLC.setVolume('-20');
             break;
 
-        case KEYS.I:
+        case 'f':
+        case 'F':
+            VLC.toggleFullscreen();
+            break;
+
+        case 'r':
+        case 'R':
+            VLC.toggleRepeat();
+            break;
+
+        case 'i':
+        case 'I':
             VLC.getInfo();
             break;
     }

@@ -1,9 +1,8 @@
 
-
-export default async function toggleFullscreen({url, password} = {}) {
+export default async function toggleRepeat({url, password} = {}) {
     
     const request = url + '?' + new URLSearchParams({
-        'command': 'fullscreen'
+        'command': 'pl_repeat'
     })
     .toString();
 
@@ -18,9 +17,9 @@ export default async function toggleFullscreen({url, password} = {}) {
 
         const statusXML = await response.text();
 
-        const fullscreen = new RegExp(/<fullscreen>(.*?)<\/fullscreen>/g)
+        const repeat = new RegExp(/<repeat>(.*?)<\/repeat>/g)
             .exec(statusXML)?.at(1);
 
-        return {fullscreen};
+        return {repeat};
     }
 }

@@ -1,24 +1,28 @@
 
 import {spawn} from "node:child_process";
 import path from "node:path";
+import togglePause from "./vlc-http-request/TogglePause.js";
+import setVolume from "./vlc-http-request/Volume.js";
+import toggleFullscreen from "./vlc-http-request/ToggleFullscreen.js";
+import toggleRepeat from "./vlc-http-request/ToggleRepeat.js";
+import getInfo from "./vlc-http-request/GetInfo.js";
 
 export class VLCPlay {
 
     constructor(params = {}){
 
         const {
-            vlcPath = process.env.VLC_HOME
+            vlcPath = process.env.VLC_HOME,
+            port = 8080
         } = params;
 
         this.vlc = path.join(vlcPath, 'vlc');
 
-        this.port = 8080;
+        this.port = port;
         this.host = '127.0.0.1';
         this.password = '1812';
 
         this.url = new URL(`http://${this.host}:${this.port}/requests/status.xml`);
-
-        this.status = {};
     }
 
     //MARK: Play
@@ -64,98 +68,41 @@ export class VLCPlay {
         }
     }
 
-    //MARK: Toggle Pause
+    //MARK: Controls
     async togglePause(){
 
-        const url = this.url.href + '?' + new URLSearchParams({
-            'command': 'pl_pause'
-        })
-        .toString();
+        const result = await togglePause({url: this.url.href, password: this.password});
 
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Basic ${btoa(`:${this.password}`)}`
-            }
-        });
-
-        if(response.ok){
-
-            const statusXML = await response.text();
-
-            const state = new RegExp(/<state>(.*?)<\/state>/g)
-                .exec(statusXML)?.at(1);
-
-            console.log('State:', state);
-
-            this.status.state = state;
-        }
+        console.log(result);
     }
 
-    //MARK: Volume
-    async volume(n){
+    async setVolume(value){
 
-        const url = this.url.href + '?' + new URLSearchParams({
-            'command': 'volume',
-            'val': n > 0 ? `+${n}` : n
-        })
-        .toString();
+        const result = await setVolume({url: this.url.href, password: this.password, value});
 
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Basic ${btoa(`:${this.password}`)}`
-            }
-        });
-
-        if(response.ok){
-
-            const statusXML = await response.text();
-
-            const volume = new RegExp(/<volume>(.*?)<\/volume>/g)
-                .exec(statusXML)?.at(1);
-
-            console.log('Volume:', volume);
-
-            this.status.volume = volume;
-        }
+        console.log(result);
     }
 
-    //MARK: Toggle Fullscreen
     async toggleFullscreen(){
 
-        
+        const result = await toggleFullscreen({url: this.url.href, password: this.password});
+
+        console.log(result);
     }
 
-    //MARK: Get info
+    async toggleRepeat(){
+
+        const result = await toggleRepeat({url: this.url.href, password: this.password});
+
+        console.log(result);
+    }
+
     async getInfo(){
 
-        const response = await fetch(this.url.href, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Basic ${btoa(`:${this.password}`)}`
-            }
-        });
-
-        if(response.ok){
-
-            const statusXML = await response.text();
-
-            const bitrate = new RegExp(/<info name='Bitrate'>(.*?)<\/info>/g)
-                .exec(statusXML)?.at(1);
-
-            const filename = new RegExp(/<info name='filename'>(.*?)<\/info>/g)
-                .exec(statusXML)?.at(1);
-
-            const type = new RegExp(/<info name='Type'>(.*?)<\/info>/g)
-                .exec(statusXML)?.at(1);
-
-            console.log({
-                filename,
-                bitrate,
-                type
-            });
-        } 
+        const result = await getInfo({url: this.url.href, password: this.password});
+        
+        console.log(result);
     }
 }
+
 
